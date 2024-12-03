@@ -1,0 +1,59 @@
+#include<bits/stdc++.h>
+using namespace std;
+char s[110][1100],p[10]={0};
+int n,m,top=0;
+int get(char ch){
+	for(int i=0;i<m;i++)
+		if(p[i]==ch)return i;
+	return -1;
+}
+int use(int x,char ch){
+	for(int i=x;i<n;i++)
+		if(ch==s[i][3]||ch==s[i][5])return i;
+	return n;
+} 
+int find(int x){
+	if(top<m)return top++;
+	int t=-1,max=-1;
+	for(int i=0;i<m;i++){
+		int k=use(x,p[i]);
+		if(k>max){
+			max=k;
+			t=i;
+		}
+	}
+	return t;
+} 
+void print1(char ch){
+	if(ch=='+')cout<<"ADD ";
+	else if(ch=='-')cout<<"SUB ";
+	else if(ch=='*')cout<<"MUL ";
+	else if(ch=='\\')cout<<"DIV ";
+}
+void print2(char ch){
+	int x=get(ch);
+	if(x!=-1)
+		cout<<"R"<<x<<endl;
+	else
+		cout<<ch<<endl;
+}
+int main(){
+	cin>>n>>m;
+	for(int i=0;i<n;i++)
+		cin>>s[i];
+	for(int i=0;i<n;i++){
+		int x=get(s[i][3]);
+		if(x==-1){
+			x=find(i);
+			if(p[x]!='\0'&&use(i,p[x])<n){
+				cout<<"ST R"<<x<<", "<<p[x]<<endl;
+				p[x]=NULL;
+			}
+			cout<<"LD R"<<x<<", "<<s[i][3]<<endl;
+		}
+		print1(s[i][4]);
+		cout<<"R"<<x<<", ";
+		print2(s[i][5]);
+		p[x]=s[i][0];
+	}
+}
