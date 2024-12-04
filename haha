@@ -1,104 +1,96 @@
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
-char str[100];
-int num = 0;
-int cur = 0;
-void E();
-void G();
-void T();
-void S();
-void F();
-void G()
-{
-    if(str[cur] == '+')
-    {
-        printf("%d G-->+TG\n",num++);
-        cur++;
-        T();
-        G();
-    }
-    else
-        printf("%d G-->&\n",num++);
+
+struct node{
+	char c;
+	int l=-1,r=-1;
+	vector<char> val;
+}p[200];
+
+int n,num=0;
+string s,ans[200];
+bool flag[200];
+
+int add(char c);
+void add_op(char op,char c,int l,int r);
+bool find_val(int id,char c);
+char chose_var(int id);
+void save(char c);
+void dfs(int id);
+
+int add(char c){
+	for(int i=0;i<num;i++){
+		if(p[i].c==c||find_val(i,c))
+		return i;
+	}
+	p[num].c=c;
+	return num++;
 }
-void S()
-{
-    if(str[cur] == '*')
-    {
-        printf("%d S-->*FS\n",num++);
-        cur++;
-        F();
-        S();
-    }
-    else
-        printf("%d S-->&\n",num++);
+void add_op(char op,char c,int l,int r){
+	for(int i=0;i<num;i++){
+		if(p[i].c==op&&p[i].l==l&&p[i].r==r){
+		p[i].val.push_back(c);
+		return ;	
+		}
+	}
+	p[num].c=op;
+	p[num].l=l;
+	p[num].r=r;
+	p[num].val.push_back(c);
+	num++;
 }
-void F()
-{
-    if(str[cur] == 'i')
-    {
-        printf("%d F-->i\n",num++);
-        cur++;
-    }
-    else
-    if(str[cur] == '(')
-    {
-        printf("%d F-->(E)\n",num++);
-        cur++;
-        E();
-        if(str[cur] == ')')
-        {
-            cur++;
-        }
-        else
-        {
-            printf("error\n");
-            exit(0);
-        }
-    }
-    else
-    {
-        printf("error\n");
-        exit(0);
-    }
+bool find_val(int id,char c){
+	for(char t:p[id].val){
+		if(t==c)
+		return true;
+	}
+	return false;
 }
-void E()
-{
-    if(str[cur] == '('||str[cur] == 'i')
-    {
-    printf("%d E-->TG\n",num++);
-    T();
-    G();
-    }
-    else
-    {
-        printf("error\n");
-        exit(0);
-    }
+char chose_var(int id){
+	if(!p[id].val.size())
+	return p[id].c;
+	for(char t:p[id].val){
+		if(t=='A'||t=='B')
+		return t;
+	}
+	return p[id].val[0];
 }
-void T()
-{
-    if(str[cur] == '('||str[cur] == 'i')
-    {
-    printf("%d T-->FS\n",num++);
-    F();
-    S();
-    }
-    else
-    {
-        printf("error\n");
-        exit(0);
-    }
+void save(char c){
+	for(int i=num-1;i>=0;i--){
+		if(ans[i][0]==c){
+			dfs(i);
+			return ;
+		}
+	}
 }
-int main()
-{
-    scanf("%s",str);
-    E();
-    if(str[cur] == '#')
-        printf("accept\n");
-    else
-        printf("error\n");
-    return 0;
+void dfs(int id){
+	if(p[id].l!=-1&&p[id].r!=-1){
+		flag[id]=true;
+		dfs(p[id].l);
+		dfs(p[id].r);
+	}
 }
 
-
-
+int main(){
+	cin>>n;
+	for(int i=0;i<n;i++){
+		cin>>s;
+		int l=add(s[2]),r=add(s[4]);
+		add_op(s[3],s[0],l,r);
+	}
+	for(int i=0;i<num;i++){
+		if(p[i].l!=-1&&p[i].r!=-1){
+			ans[i].push_back(chose_var(i));
+			ans[i].push_back('=');
+			ans[i].push_back(chose_var(p[i].l));
+			ans[i].push_back(p[i].c);
+			ans[i].push_back(chose_var(p[i].r));
+		}
+	}
+	save('A'),save('B');
+	for(int i=0;i<num;i++){
+		if(flag[i])
+		cout<<ans[i]<<endl;
+	}
+	return 0;
+} 
